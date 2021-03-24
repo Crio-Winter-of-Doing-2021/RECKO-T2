@@ -8,7 +8,7 @@ import Fade from '@material-ui/core/Fade';
 
 
 
-const CreateMeme = ({onCreate, onCheck}) => {
+const CreateeAccount = ({onCreate, onCheck}) => {
     const[id,setId]=useState('')
 
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -101,4 +101,4 @@ const handleClose = () => {
     )
 }
 
-export default CreateMeme;
+export default CreateAccount;
