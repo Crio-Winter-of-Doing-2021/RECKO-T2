@@ -8,7 +8,7 @@ import Fade from '@material-ui/core/Fade';
 
 
 
-const CreateeAccount = ({onCreate, onCheck}) => {
+const CreateAccount = ({onCreate, onCheck}) => {
     const[id,setId]=useState('')
 
     const [anchorEl, setAnchorEl] = React.useState(null);
