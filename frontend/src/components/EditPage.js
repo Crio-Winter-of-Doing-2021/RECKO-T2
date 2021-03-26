@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect, useHistory ,Link } from "react-router-dom";
+import { useHistory  } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -11,12 +11,9 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Table from './Table'
-import Table1 from './HomePage';
 import {Home, Add , PowerSettingsNew , Edit,Delete} from "@material-ui/icons"
-import EditForm from './EditForm'
-import EditForm1 from './EditForm1'
-import {useState,useEffect} from 'react'
+import EditForm from '../components/EditForm'
+import {useState} from 'react'
 
 const drawerWidth = 240;
 
@@ -46,26 +43,99 @@ const useStyles = makeStyles((theme) => ({
 export default function ClippedDrawer({setAuth}) {
   const classes = useStyles();
   const [check,onCheck]=useState(false)
-    
+  const [message,setMessage]=useState(false)
+  const [company,setCompany]=useState('')
+  const [name,setName]=useState('')
+  const [description,setDescription]=useState('')
   let history = useHistory();
 
-  const createAccount = async (account) => {
-    await fetch("http://localhost:8080/new", {
-     method: "POST",
-     headers: {
-       "Content-type": "application/json",
-       Authorization : "Bearer " +localStorage.token
-     },
-     body: JSON.stringify(account),
-   })
-   .then(result =>{
-     console.log(check)
-  }
-   )
-   .catch((err)=> {
-     console.log("gfgdf");
-   });
+  const editAccount = async (account) => {
+    
+    try{
+      const company=account.company;
+        console.log(company);
+        if(company==='XERO')
+        {
+          setCompany(company)
+            const response= await fetch("http://localhost:8080/xero/edit", {
+            method:"POST",
+           headers:{ "Content-Type": "application/json" ,
+            Authorization : "Bearer " +localStorage.token
+        },
+            body: JSON.stringify(account)
+        });
+        const tmp=await response.json();
+          setName(tmp.name);
+          setDescription(tmp.description)
+          onCheck(true);
+        }
+        else
+        {
+           // const body={name,description};
+            const response= await fetch("http://localhost:8080/quickbooks/edit", {
+            method:"POST",
+            headers:{ "Content-Type": "application/json",
+            Authorization : "Bearer " +localStorage.token
+        },
+            body: JSON.stringify(account)
+        });
+        const tmp=await response.json();
+        setName(tmp.name);
+        setDescription(tmp.description)
+        onCheck(true);
+        
+        }
+      }
+      catch(err){
+          console.log(err);
+      }
+
  }
+
+
+ const editAccount1 = async (account) => {
+    
+  try{
+    const company=account.company;
+      console.log(company);
+      if(company==='XERO')
+      {
+          const response= await fetch("http://localhost:8080/xero/edit", {
+          method:"POST",
+          headers:{ "Content-Type": "application/json" ,
+          Authorization : "Bearer " +localStorage.token
+      },
+          body: JSON.stringify(account)
+      });
+      const tmp=await response.json();
+        onCheck(false);
+        setMessage(true)
+      }
+      else
+      {
+         // const body={name,description};
+          const response= await fetch("http://localhost:8080/quickbooks/edit", {
+          method:"POST",
+          headers:{ "Content-Type": "application/json",
+          Authorization : "Bearer " +localStorage.token
+      },
+          body: JSON.stringify(account)
+      });
+      const parseRes=await response.json();
+        onCheck(false);
+        setMessage(true)
+      }
+    }
+    catch(err){
+        console.log(err);
+    }
+
+}
+
+
+
+
+
  
 
   return (
@@ -185,9 +255,7 @@ export default function ClippedDrawer({setAuth}) {
       <main className={classes.content}>
         <Toolbar />
 
-       {check===false?
-       <EditForm onCreate={createAccount} onCheck={onCheck}/>
-       : <EditForm1 onCreate={createAccount} />}
+       <EditForm onEdit={editAccount} onEdit1={editAccount1} oldName={name} oldDescription={description} check={check} setcompany={company} message={message}/>
       </main>
     </div>
   );

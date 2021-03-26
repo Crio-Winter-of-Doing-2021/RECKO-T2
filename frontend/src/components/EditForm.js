@@ -1,32 +1,37 @@
-import React, { Component ,useState} from 'react'
-import {Container, Box , Typography ,TextField , CircularProgress, Button} from "@material-ui/core"
-import Menu from '@material-ui/core/Menu';
+import React, { useState} from 'react'
+import {Container, Box , Typography ,TextField ,  Button} from "@material-ui/core"
 import MenuItem from '@material-ui/core/MenuItem';
-import Fade from '@material-ui/core/Fade';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
 
 
 
-
-
-const CreateAccount = ({onCreate, onCheck}) => {
+const EditAccount = ({onEdit,onEdit1,oldName,oldDescription,check,setcompany,message}) => {
     const[id,setId]=useState('')
+    const [company, setCompany] = React.useState(setcompany);
+    const[name,setName]=useState(oldName)
+    const[description,setDescription]=useState(oldDescription)
 
-    const [anchorEl, setAnchorEl] = React.useState(null);
-const open = Boolean(anchorEl);
+    const handleChange = (event) => {
+      setCompany(event.target.value);
+    };
 
-const handleClick = (event) => {
-  setAnchorEl(event.currentTarget);
-};
-
-const handleClose = () => {
-  setAnchorEl(null);
-};
 
     const onSubmit =(e) =>{
         e.preventDefault();
-        onCreate({id});
-        onCheck(true)
+        onEdit({id,company});
         setId('')
+    }
+
+
+    const checkSubmit=(e)=>{
+      e.preventDefault();
+      onEdit1({name,description,company});
+
+      setCompany('')
+       setName('')
+      setDescription('')
+
     }
 
     return (
@@ -38,12 +43,15 @@ const handleClose = () => {
          p="24px"
           mt="50px"
         >
-            {/* <img src={logo} height="100px"></img> */}
             <Typography variant="h5" color="textSecondary">Edit Form</Typography>
+            {message===true? 
+          <Typography variant="h5" color="textSecondary">Account Edited</Typography>
+               :null}
 
+       {check===false ? 
             <form onSubmit={onSubmit}> 
 
-
+      
             <TextField
       label="Id"
       id="outlined-size-small"
@@ -51,9 +59,6 @@ const handleClose = () => {
       variant="outlined"
       name="id"
       onChange={(e) => {setId(e.target.value)}} required
-     // onChange={this.handleChange}
-    //  error={this.state.username_error!=null}
-      //  helperText={this.state.username_error}
       color="secondary"
       size="small"
       fullWidth
@@ -63,22 +68,17 @@ const handleClose = () => {
     <br />
     <br />
 
-    <Button aria-controls="fade-menu" aria-haspopup="true" onClick={handleClick}>   
-       SELECT COMPANY
-      </Button>
+    <InputLabel id="demo-simple-select-label">Company</InputLabel>
+      <Select
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          value={company}
+          onChange={handleChange}
+        >
+          <MenuItem value={"XERO"}>XERO</MenuItem>
+          <MenuItem value={"QUICKBOOKS"}>QUICKBOOKS</MenuItem>
 
-        <Menu
-        id="fade-menu"
-        anchorEl={anchorEl}
-        keepMounted
-        open={open}
-        onClose={handleClose}
-        TransitionComponent={Fade}
-      >
-        <MenuItem onClick={handleClose}>XERO</MenuItem>
-        <MenuItem onClick={handleClose}>QUICKBOOKS</MenuItem>
-      </Menu>
-
+        </Select>
 
     <br />
     <br />
@@ -89,16 +89,82 @@ const handleClose = () => {
     color="primary" 
     fullWidth
     type="submit"
-    // onClick={console.log("gi")}
     >
     EDIT
     </Button>
     <br></br>
-        {/* {this.state.error} */}
+
     </form>
+
+          :
+
+          <form onSubmit={checkSubmit}> 
+
+
+          <TextField
+    label="name"
+    id="outlined-size-small"
+    type="text"
+    variant="outlined"
+    name="name"
+    value={name}
+    onChange={(e) => {setName(e.target.value)}} required
+    color="secondary"
+    size="small"
+    fullWidth
+    margin="normal"
+  />
+
+
+  <TextField
+    label="description"
+    id="outlined-size-small"
+    type="text"
+    variant="outlined"
+    name="description"
+    value={description}
+    onChange={(e) => {setDescription(e.target.value)}} required
+    color="secondary"
+    size="small"
+    fullWidth
+    margin="normal"
+  />
+
+  <br />
+  <br />
+
+  <InputLabel id="demo-simple-select-label">Company</InputLabel>
+<Select
+    labelId="demo-simple-select-label"
+    id="demo-simple-select"
+    value={company}
+    onChange={handleChange}
+    disabled
+  >
+    <MenuItem value={"XERO"}>XERO</MenuItem>
+    <MenuItem value={"QUICKBOOKS"}>QUICKBOOKS</MenuItem>
+
+  </Select>
+
+
+  <br />
+  <br />
+  <br />
+  <br />
+  <Button disabledElevation 
+  variant="contained" 
+  color="primary" 
+  fullWidth
+  type="submit"
+  >
+  Edit Account
+  </Button>
+  <br></br>
+  </form>
+       }
         </Box>
     </Container>
     )
 }
 
-export default CreateAccount;
+export default EditAccount;

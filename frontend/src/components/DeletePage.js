@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect, useHistory ,Link } from "react-router-dom";
+import {  useHistory } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -11,10 +11,9 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Table from './Table'
-import Table1 from './HomePage';
 import {Home, Add , PowerSettingsNew , Edit,Delete} from "@material-ui/icons"
-import DeleteForm from './DeleteForm'
+import DeleteForm from '../components/DeleteForm'
+import {useState} from 'react'
 
 const drawerWidth = 240;
 
@@ -43,25 +42,44 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ClippedDrawer({setAuth}) {
   const classes = useStyles();
-    
+  const [message,setMessage]=useState(null)
   let history = useHistory();
 
-  const createAccount = async (account) => {
-    
-    await fetch("http://localhost:8080/new", {
-     method: "POST",
-     headers: {
-       "Content-type": "application/json",
-       Authorization : "Bearer " +localStorage.token
-     },
-     body: JSON.stringify(account),
-   })
-   .then(result =>{
-     <Redirect to="/dashboard" />
-   })
-   .catch(err =>{
-     console.log("gfgdf");
-   })
+  const deleteAccount = async (account) => {
+    try{
+    const company=account.company;
+      console.log(company);
+      if(company==='XERO')
+      {
+          const response= await fetch("http://localhost:8080/xero/delete", {
+          method:"DELETE",
+          headers:{ "Content-Type": "application/json" ,
+          Authorization : "Bearer " +localStorage.token
+      },
+          body: JSON.stringify(account)
+      });
+      const parseRes=await response.json();
+      setMessage(parseRes.message);
+      console.log(message);
+      }
+      else
+      {
+         // const body={name,description};
+          const response= await fetch("http://localhost:8080/quickbooks/delete", {
+          method:"DELETE",
+          headers:{ "Content-Type": "application/json",
+          Authorization : "Bearer " +localStorage.token
+      },
+          body: JSON.stringify(account)
+      });
+      const parseRes=await response.json();
+      setMessage(parseRes.message);
+      }
+    }
+    catch(err){
+        console.log(err);
+    }
+
  }
 
 
@@ -92,7 +110,7 @@ export default function ClippedDrawer({setAuth}) {
              onClick={
               e=>{
                 console.log("hi");
-               // <Link to ="/addForm" />
+              
                history.push("/homepage")
               }
              }
@@ -107,7 +125,7 @@ export default function ClippedDrawer({setAuth}) {
                onClick={
                 e=>{
                   console.log("hi");
-                 // <Link to ="/addForm" />
+                
                  history.push("/addForm")
                 }
                }
@@ -180,9 +198,8 @@ export default function ClippedDrawer({setAuth}) {
       </Drawer>
       <main className={classes.content}>
         <Toolbar />
-        {/* <Table /> */}
        
-       <DeleteForm onCreate={createAccount} />
+       <DeleteForm onDelete={deleteAccount}  message={message}/>
       </main>
     </div>
   );

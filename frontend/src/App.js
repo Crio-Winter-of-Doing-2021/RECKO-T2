@@ -4,7 +4,6 @@ import './App.css';
 import {Switch, Route, Redirect} from 'react-router-dom'
 import Login from './components/Login'
 import Logout from './components/Logout'
-import Dashboard from './components/Dashboard'
 import Form from './components/Form'
 import EditForm from './components/EditPage'
 import DeleteForm from './components/DeletePage'
@@ -13,6 +12,7 @@ import HomePage from './components/HomePage'
 function App() {
 
   const [isAuthenticated,setIsAuthenticated]=useState(null);
+  
   const checkAuthenticated =async () =>{
     try{
       const response=await fetch("http://localhost:8080/check", {
@@ -29,6 +29,10 @@ function App() {
       console.log(err.message)
     }
   };
+
+
+
+
 
   useEffect(() => {
     const pathname =window.location.pathname;
@@ -56,10 +60,7 @@ function App() {
      !isAuthenticated !==null ? (!isAuthenticated ? <Login {...props} setAuth={setAuth} /> : <Redirect to="/homepage" />) : null
      }
      />
-      {/* <Route exact path="/dashboard"  render= {props =>
-    isAuthenticated !==null ? (isAuthenticated ? <Dashboard {...props} setAuth={setAuth}/>: <Redirect to="/login" />):null
-     }
-     /> */}
+
       <Route exact path="/logout" render= {props =>
      isAuthenticated !==null ? (isAuthenticated ? <Logout />: <Redirect to="/login" />):null
      }
@@ -70,7 +71,7 @@ function App() {
      />
 
     <Route exact path="/addForm"  render= {props =>
-     isAuthenticated !==null ? (isAuthenticated ? <Form  {...props} setAuth={setAuth} />: <Redirect to="/login" />):null
+     isAuthenticated !==null ? (isAuthenticated ? <Form  {...props} setAuth={setAuth}  />: <Redirect to="/login" />):null
      }
      />
 
@@ -83,13 +84,6 @@ function App() {
      isAuthenticated !==null ? (isAuthenticated ? <DeleteForm  {...props} setAuth={setAuth} />: <Redirect to="/login" />):null
      }
      />
-
-
-
-     {/* <Route exact path={["/","/login"]} component={Login} />
-     <Route exact path="/dashboard" component={Dashboard} />
-     <Route exact path="/logout" component={Logout} />
-     <Route exact path="/add" component={AddForm} /> */}
    </Switch>
   );
 }

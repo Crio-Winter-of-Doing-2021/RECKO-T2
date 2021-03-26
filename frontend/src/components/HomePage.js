@@ -11,10 +11,10 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Table from './Table'
-//import Table1 from '../components/HomePage';
+import TableContent from '../components/TableContent'
 import {Home, Add , PowerSettingsNew , Edit,Delete} from "@material-ui/icons"
 import { useState, useEffect } from 'react'  
+
 
 const drawerWidth = 240;
 
@@ -48,7 +48,7 @@ export default function ClippedDrawer({logout}) {
   const [rows,setRow]=useState([]);
 
   useEffect(() =>{
-
+    rows.splice(0,rows.length);
     const GetRow = async () => {    
 
       const response=await fetch("http://localhost:8080/all", {
@@ -58,7 +58,7 @@ export default function ClippedDrawer({logout}) {
     }
   });
   const result = await response.json();
-  setRow(result);
+    setRow(result);
   console.log(result);
     }  
    GetRow();    
@@ -183,8 +183,8 @@ export default function ClippedDrawer({logout}) {
       <main className={classes.content}>
         <Toolbar />
        {rows.length!==0?
-       <Table  rows={rows}/>
-       :null}
+       <TableContent  rowInformation={rows}/>
+         :null} 
       </main>
     </div>
   );

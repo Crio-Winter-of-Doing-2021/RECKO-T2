@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect, useHistory ,Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -11,10 +11,9 @@ import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Table from './Table'
-import Table1 from './HomePage';
 import {Home, Add , PowerSettingsNew , Edit,Delete} from "@material-ui/icons"
-import AddForm from './AddForm'
+import AddForm from '../components/AddForm'
+import {useState} from 'react'
 
 const drawerWidth = 240;
 
@@ -43,26 +42,47 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ClippedDrawer({setAuth}) {
   const classes = useStyles();
-    
+  const [message,setMessage]=useState(null)
   let history = useHistory();
 
-  const createAccount = async (account) => {
     
-    await fetch("http://localhost:8080/new", {
-     method: "POST",
-     headers: {
-       "Content-type": "application/json",
-       Authorization : "Bearer " +localStorage.token
-     },
-     body: JSON.stringify(account),
-   })
-   .then(result =>{
-     <Redirect to="/dashboard" />
-   })
-   .catch(err =>{
-     console.log("gfgdf");
-   })
- }
+    const createAccount= async (account) => {
+      try{
+      const company=account.company;
+      console.log(company);
+      if(company==='XERO')
+      {
+          const response= await fetch("http://localhost:8080/xero/new", {
+          method:"POST",
+          headers:{ "Content-Type": "application/json" ,
+          Authorization : "Bearer " +localStorage.token
+      },
+          body: JSON.stringify(account)
+      });
+      const parseRes=await response.json();
+      setMessage(parseRes.message);
+      console.log(message);
+      }
+      else
+      {
+         // const body={name,description};
+          const response= await fetch("http://localhost:8080/quickbooks/new", {
+          method:"POST",
+          headers:{ "Content-Type": "application/json",
+          Authorization : "Bearer " +localStorage.token
+      },
+          body: JSON.stringify(account)
+      });
+      const parseRes=await response.json();
+      setMessage(parseRes.message);
+      }
+    }
+    catch(err){
+        console.log(err);
+    }
+   }
+  
+ 
 
 
   return (
@@ -180,9 +200,8 @@ export default function ClippedDrawer({setAuth}) {
       </Drawer>
       <main className={classes.content}>
         <Toolbar />
-        {/* <Table /> */}
        
-       <AddForm onCreate={createAccount} />
+       <AddForm onCreate={createAccount}  message={message}/>
       </main>
     </div>
   );
