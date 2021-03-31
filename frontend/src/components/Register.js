@@ -1,5 +1,5 @@
 import React, { Component ,useState} from 'react'
-import {useHistory,Link} from "react-router-dom";
+import {useHistory,Link,Redirect} from "react-router-dom";
 import {Container, Box , Typography ,TextField , CircularProgress, Button} from "@material-ui/core"
 
 
@@ -11,6 +11,7 @@ export default function Login({setAuth}){
     const [username,setUsername]=useState('');
     const [password,setPassword]=useState('');
     const [confirmPassword,setConfirmPassword]=useState('');
+    const [change,setChange]=useState(false)
     const history=useHistory();
     const submitForm = async (e) =>{
          e.preventDefault();
@@ -22,6 +23,8 @@ export default function Login({setAuth}){
                 body: JSON.stringify(body)
             });
             const parseRes=await response.json();
+            if(parseRes===true)
+            setChange(true)
             // if(parseRes.message!==undefined)
             // setAuth(true);
             // else
@@ -34,7 +37,12 @@ export default function Login({setAuth}){
     }
 
         return( 
+
         <>
+
+            {change===true?<Redirect to="/login" /> :
+
+            <>
        
             <Container maxWidth="xlg">
             <Box bgcolor="white"
@@ -170,6 +178,8 @@ export default function Login({setAuth}){
 
             </Box>
         </Container>
+        </>
+      }
         </>
        
   );

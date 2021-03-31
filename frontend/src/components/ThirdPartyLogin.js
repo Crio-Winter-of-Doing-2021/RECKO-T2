@@ -48,7 +48,27 @@ export default function ClippedDrawer() {
   let history = useHistory();
   const [rows,setRow]=useState([]);
 
+ const onClick=async()=>{
+  const response=await fetch('http://localhost:8080/xero/login',{
+        method: "POST",
+        headers: {
+          Authorization : "Bearer " +localStorage.token
+        }
+      });
+      const parseRes = await response.json();
+      console.log(parseRes);
+  }
 
+  const onClick1=async()=>{
+    const response=await fetch('http://localhost:8080/quickbooks/login',{
+          method: "POST",
+          headers: {
+            Authorization : "Bearer " +localStorage.token
+          }
+        });
+        const parseRes = await response.json();
+        console.log(parseRes);
+    }
   
 
   return (
@@ -56,6 +76,7 @@ export default function ClippedDrawer() {
       <h1>PLEASE LOGIN FIRST </h1>
       <Button  variant="contained" 
         color="primary" 
+        onClick={onClick}
         >Login to XERO</Button>
         <br/>
         <br/>
@@ -63,6 +84,7 @@ export default function ClippedDrawer() {
       <Button
        variant="contained" 
        color="primary" 
+       onClick={onClick1}
        >Login to QUICKBOOKS</Button>
 
      </>
