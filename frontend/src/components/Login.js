@@ -1,4 +1,5 @@
 import React, { Component ,useState} from 'react'
+import {useHistory,Link} from "react-router-dom";
 import {Container, Box , Typography ,TextField , CircularProgress, Button} from "@material-ui/core"
 
 
@@ -7,6 +8,7 @@ export default function Login({setAuth}){
 
     const [username,setUsername]=useState('');
     const [password,setPassword]=useState('');
+    const history=useHistory();
     const submitForm = async (e) =>{
         e.preventDefault();
         try{
@@ -26,10 +28,18 @@ export default function Login({setAuth}){
             console.log(err.message);
         }
     }
+
+    const onClick=()=>{
+        history.push('/register');
+    }
+    
     
 
         return( 
         <>
+
+    
+
             <Container maxWidth="xlg">
             <Box bgcolor="white"
              textAlign="center" 
@@ -45,7 +55,11 @@ export default function Login({setAuth}){
 
             <br />
             <br />
-        
+
+
+
+
+           
         <Container maxWidth="xs">
             <Box bgcolor="white"
              textAlign="center" 
@@ -55,7 +69,8 @@ export default function Login({setAuth}){
               mt="50px"
             >
                 <Typography variant="h5" color="textSecondary">Admin</Typography>
-
+               
+        
                 <form onSubmit={submitForm}> 
 
 
@@ -99,6 +114,20 @@ export default function Login({setAuth}){
         </Button>
         <br></br>
         </form>
+        <br></br>
+        {/* <Button disabledElevation 
+        variant="contained" 
+        color="primary" 
+        fullWidth
+        onClick={onClick}
+        >
+        REGISTER
+        </Button>
+         */}
+          <Link to="/register">
+        REGISTER
+        </Link>
+        
             </Box>
         </Container>
         </>

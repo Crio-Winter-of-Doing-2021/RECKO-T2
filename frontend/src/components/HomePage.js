@@ -14,6 +14,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import TableContent from '../components/TableContent'
 import {Home, Add , PowerSettingsNew , Edit,Delete} from "@material-ui/icons"
 import { useState, useEffect } from 'react'  
+import ThirdPartyLogin from './ThirdPartyLogin.js'
 
 
 const drawerWidth = 240;
@@ -41,30 +42,32 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ClippedDrawer({logout}) {
+export default function ClippedDrawer({logout,val}) {
   const classes = useStyles();
     
   let history = useHistory();
-  const [rows,setRow]=useState([]);
+  const [rows,setRows]=useState([]);
+ // const [val,setVal]=useState(false)
 
-  useEffect(() =>{
-    rows.splice(0,rows.length);
-    const GetRow = async () => {    
+  // useEffect(() =>{
+  //   rows.splice(0,rows.length);
+  //   const GetRow = async () => {    
 
-      const response=await fetch("http://localhost:8080/all", {
-    method: "GET",
-    headers: {
-      Authorization : "Bearer " +localStorage.token
-    }
-  });
-  const result = await response.json();
-    setRow(result);
-  console.log(result);
-    }  
-   GetRow();    
-   console.log(rows);
+  //     const response=await fetch("http://localhost:8080/ck", {
+  //   method: "POST",
+  //   headers: {
+  //     Authorization : "Bearer " +localStorage.token
+  //   }
+  // });
+  // const result = await response.json();
+  //   result===true?setVal(true):setVal(false)
+  //   console.log(val)
+  //   }  
+  //  GetRow();    
 
-  },[])
+  // },[])
+
+   
 
 
   return (
@@ -162,9 +165,10 @@ export default function ClippedDrawer({logout}) {
               <ListItem button onClick={
                 
                   e=>{
+                    history.push('/logout')
                     console.log("hi");
                   // localStorage.removeItem('token')
-                   logout(false)
+                  // logout(false)
                   }
               }>
                 <ListItemIcon>
@@ -182,9 +186,9 @@ export default function ClippedDrawer({logout}) {
       </Drawer>
       <main className={classes.content}>
         <Toolbar />
-       {rows.length!==0?
-       <TableContent  rowInformation={rows}/>
-         :null} 
+       {val?
+       history.push('/table')
+         :<ThirdPartyLogin />} 
       </main>
     </div>
   );

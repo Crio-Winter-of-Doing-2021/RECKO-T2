@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory  } from "react-router-dom";
+import { useHistory ,Redirect } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -13,7 +13,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import {Home, Add , PowerSettingsNew , Edit,Delete} from "@material-ui/icons"
 import EditForm from '../components/EditForm'
-import {useState} from 'react'
+import {useState,useEffect} from 'react'
 
 const drawerWidth = 240;
 
@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ClippedDrawer({setAuth}) {
+export default function ClippedDrawer({setAuth,logout}) {
   const classes = useStyles();
   const [check,onCheck]=useState(false)
   const [message,setMessage]=useState(false)
@@ -48,6 +48,7 @@ export default function ClippedDrawer({setAuth}) {
   const [name,setName]=useState('')
   const [description,setDescription]=useState('')
   let history = useHistory();
+
 
   const editAccount = async (account) => {
     
@@ -234,9 +235,10 @@ export default function ClippedDrawer({setAuth}) {
               <ListItem button onClick={
                 
                   e=>{
+                    history.push('/logout')
                     console.log("hi");
-                   localStorage.removeItem('token')
-                   setAuth(false)
+                  // localStorage.removeItem('token')
+                  // setAuth(false)
                   }
               }>
                 <ListItemIcon>
@@ -254,7 +256,7 @@ export default function ClippedDrawer({setAuth}) {
       </Drawer>
       <main className={classes.content}>
         <Toolbar />
-
+       
        <EditForm onEdit={editAccount} onEdit1={editAccount1} oldName={name} oldDescription={description} check={check} setcompany={company} message={message}/>
       </main>
     </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import {  useHistory } from "react-router-dom";
+import {  useHistory,Redirect } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -13,7 +13,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import {Home, Add , PowerSettingsNew , Edit,Delete} from "@material-ui/icons"
 import DeleteForm from '../components/DeleteForm'
-import {useState} from 'react'
+import {useState,useEffect} from 'react'
 
 const drawerWidth = 240;
 
@@ -40,10 +40,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ClippedDrawer({setAuth}) {
+export default function ClippedDrawer({setAuth,logout}) {
   const classes = useStyles();
   const [message,setMessage]=useState(null)
   let history = useHistory();
+  const [rows,setRow]=useState([])
+  const [val,setVal]=useState(false)
+
 
   const deleteAccount = async (account) => {
     try{
@@ -178,9 +181,10 @@ export default function ClippedDrawer({setAuth}) {
               <ListItem button onClick={
                 
                   e=>{
+                    history.push('/logout')
                     console.log("hi");
-                   localStorage.removeItem('token')
-                   setAuth(false)
+                  // localStorage.removeItem('token')
+                  // setAuth(false)
                   }
               }>
                 <ListItemIcon>

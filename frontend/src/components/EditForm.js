@@ -74,6 +74,7 @@ const EditAccount = ({onEdit,onEdit1,oldName,oldDescription,check,setcompany,mes
           id="demo-simple-select"
           value={company}
           onChange={handleChange}
+          required
         >
           <MenuItem value={"XERO"}>XERO</MenuItem>
           <MenuItem value={"QUICKBOOKS"}>QUICKBOOKS</MenuItem>

@@ -1,14 +1,32 @@
 import React from 'react'
 import {Redirect} from 'react-router-dom'
+import {useEffect} from 'react'
 
-export default class Logout extends React.Component{
+export default function Logout({setAuth,logout}){
 
-    constructor(){
-        super()
-        localStorage.removeItem('token')
+   useEffect(() => {
+    const log=async()=>{
+        try{
+           
+            const response=await fetch('http://localhost:8080/logout',{
+              method: "POST",
+              headers: {
+                Authorization : "Bearer " +localStorage.token
+              }
+            });
+            const parseRes = await response.json();
+            }catch(err){
+              console.log(err.message)
+            }
+            console.log("cleared")
+       
     }
+    log();
+    localStorage.removeItem('token')
+    setAuth(false)
+    logout(false)
+    })
 
-    render(){
-        return <Redirect to="/login" />
-    }
+        return (<Redirect to="/login" />)
+    
 }
