@@ -33,34 +33,6 @@ import {Home, Add , PowerSettingsNew , Edit,Delete} from "@material-ui/icons"
 import ThirdPartyLogin from '../components/ThirdPartyLogin'
 
 
-function descendingComparator(a,b,orderBy){
-    if(b[orderBy]<a[orderBy]){
-        return -1
-    }
-
-    if(b[orderBy]>a[orderBy]){
-        return 1
-    }
-    return 0
-
-}
-
-function getComparator(order,orderBy){
-    return order==="desc"
-    ?(a,b) => descendingComparator(a,b,orderBy)
-    :(a,b) => -descendingComparator(a,b,orderBy)
-}
-
-const sortedRowInformation =(rowArray,comparator)=>{
-    const stabilizedRowArray = rowArray.map((el,index) => [el,index])
-    stabilizedRowArray.sort((a,b) =>{
-        const order = comparator(a[0],b[0])
-        if(order!==0)return order
-        return a[1]-b[1]
-    })
-    return stabilizedRowArray.map((el)=>el[0])
-}
-
 
 export default function TableContent({row}) {
     
@@ -95,7 +67,7 @@ export default function TableContent({row}) {
   console.log(result);
     }
     GetRow();  
-    },[query,columnToQuery,orderDirection,valueToOrderBy,page,rowsPerPage]);
+    },[orderDirection,valueToOrderBy,page,rowsPerPage]);
 
            
        
@@ -132,15 +104,33 @@ export default function TableContent({row}) {
        // GetRow();
     }
 
+    const onClick=e=>{
+        const GetRow = async () => {    
+            const body={query,columnToQuery,rowsPerPage,page,orderDirection,valueToOrderBy}
+          const response=await fetch("http://localhost:8080/all", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json" ,
+          Authorization : "Bearer " +localStorage.token
+        },
+        body: JSON.stringify(body)
+      });
+      const result = await response.json();
+        setRows(result);
+      console.log(result);
+        }
+        GetRow();  
+    }
+
     return(
         
         <>
        { rows!==undefined ?
        <>
+       <div style={{display: "flex"}}>
        {/* <div style={{display: "flex"}}> */}
-       <div style={{display: "flex" , margin: "auto"}}>
 
-        <Box width="40%" m={0,2}>
+        <Box width="30%" >
        <TextField
           label="Search"
           id="outlined-size-small"
@@ -154,9 +144,10 @@ export default function TableContent({row}) {
           margin="normal"
         />
         </Box>
+      
        
        <Select
-          style={{marginLeft: "1em"}}
+          style={{marginLeft: "4em", marginRight: "2em"}}
           floatingLabelText="Select a column"
           id="demo-simple-select"
           value={columnToQuery}
@@ -167,8 +158,21 @@ export default function TableContent({row}) {
           <MenuItem value={'Type'}>Type</MenuItem>
         </Select>
         
+
+        <Box m={2}>
+        <Button disabledElevation 
+        variant="contained" 
+        color="primary" 
+        onClick={onClick}
+        type="submit"
+        >
+        SEARCH
+        </Button>
+        </Box>
+       
         </div>
-        {/* </div> */}
+        <br></br>
+        <br></br>
 
        <Paper >
         <TableContainer>
@@ -182,9 +186,9 @@ export default function TableContent({row}) {
 
                 {
                 
-                    sortedRowInformation(rows,getComparator(orderDirection,valueToOrderBy))
+                   // sortedRowInformation(rows,getComparator(orderDirection,valueToOrderBy))
                     // .slice(page*rowsPerPage,page*rowsPerPage+rowsPerPage)
-                    .map((account,id) =>(
+                    row.map((account,id) =>(
                         <TableRow key={id}>
                             <TableCell>
                                 {account.id}
