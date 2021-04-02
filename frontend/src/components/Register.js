@@ -12,6 +12,7 @@ export default function Login({setAuth}){
     const [password,setPassword]=useState('');
     const [confirmPassword,setConfirmPassword]=useState('');
     const [change,setChange]=useState(false)
+    const[message,setMessage]=useState('');
     const history=useHistory();
     const submitForm = async (e) =>{
          e.preventDefault();
@@ -23,13 +24,11 @@ export default function Login({setAuth}){
                 body: JSON.stringify(body)
             });
             const parseRes=await response.json();
-            if(parseRes===true)
+         //   console.log(parseRes)
+            if(parseRes.message===true)
             setChange(true)
-            // if(parseRes.message!==undefined)
-            // setAuth(true);
-            // else
-            // setAuth(false);
-            // localStorage.setItem("token",parseRes.token);
+            else
+            setMessage(parseRes.message)
             console.log("hi");
         }catch(err){
             console.log(err.message);
@@ -76,7 +75,9 @@ export default function Login({setAuth}){
               mt="50px"
             >
                 <Typography variant="h5" color="textSecondary">Register</Typography>
-
+                {message!==''?
+               <Typography variant="h5" color="textSecondary">{message}</Typography>:null
+            }
                 <form onSubmit={submitForm}> 
 
             
