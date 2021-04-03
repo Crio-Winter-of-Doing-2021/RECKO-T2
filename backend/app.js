@@ -661,9 +661,15 @@ app.post('/quickbooks/new', verifyToken, (req, res, next) => {
         });
 })
 
-app.delete('/xero/delete', verifyToken, (req, res, next) => {
-    res.send({ message: "Account Deleted" });
-    console.log(req.body);
+app.delete('/xero/delete', verifyToken, async (req, res, next) => {
+    try {
+        let accountDeleteResponse = await xero.accountingApi.deleteAccount(id, req.body.id);
+        console.log(accountDeleteResponse.body);
+        res.send({ message: "Account Deleted" });
+    } catch (error) {
+        console.log(error);
+        res.send({ message: "Account deletion failed" })
+    }
 })
 
 
@@ -672,12 +678,35 @@ app.delete('/quickbooks/delete', verifyToken, (req, res, next) => {
     console.log(req.body);
 })
 
-
+let ob2;
 app.post('/xero/edit', verifyToken, async (req, res, next) => {
 
-    res.send({ name: "piyush", description: "check" });
+    // res.send({ name: "piyush", description: "check" });
+    const length = Object.keys(req.body).length;
+    if (length == 2) {
+        try {
+            const accountGetResponse = await xero.accountingApi.getAccount(id, req.body.id);
+            ob2 = accountGetResponse.body;
+            res.json(true);
+        } catch (error) {
+            console.log(error);
+            res.json(false);
+        }
+    }
+    else {
+        try {
+            const accountUp = new xeroNode.Account({ name: ob2.accounts[0].name });
+            const accounts = new xeroNode.Accounts({ accounts: [accountUp] });
+            const accountUpdateResponse = await xero.accountingApi.updateAccount(id, ob2.accounts[0].accountID, accounts);
+            console.log(accountUpdateResponse.body);
+            res.json(true);
+        } catch (error) {
+            console.log(error);
+            res.json(false);
+        }
+    }
 })
-
+let ob;
 app.post('/quickbooks/edit', verifyToken, async (req, res, next) => {
     // console.log(req.body);
     const length = Object.keys(req.body).length;
@@ -694,28 +723,56 @@ app.post('/quickbooks/edit', verifyToken, async (req, res, next) => {
                 // if (typeof (authResponse.body.Account.Name) === 'undefined') {
                 //     return false;
                 // }
+                ob = JSON.parse(authResponse.body);
+                console.log(ob);
                 console.log('ok');
                 res.json(true);
             })
             .catch(function (e) {
                 // console.log(e);
-                console.log('not ok');
+                console.log(e);
                 res.json(false);
             });
     } else {
+        const body = {
+            "FullyQualifiedName": ob.Account.Name,
+            "domain": "QBO",
+            "SubAccount": false,
+            "Description": req.body.description,
+            "Classification": ob.Account.Classification,
+            "AccountSubType": ob.Account.AccountSubType,
+            "CurrentBalanceWithSubAccounts": ob.Account.CurrentBalanceWithSubAccounts,
+            "sparse": false,
+            "MetaData": {
+                "CreateTime": ob.Account.MetaData.CreateTime,
+                "LastUpdatedTime": ob.Account.MetaData.LastUpdatedTime
+            },
+            "AccountType": ob.Account.AccountType,
+            "CurrentBalance": ob.Account.CurrentBalance,
+            "Active": true,
+            "SyncToken": "0",
+            "Id": ob.Account.Id,
+            "Name": ob.Account.Name
+        }
         const companyID = oauthClient.getToken().realmId;
         const url =
             oauthClient.environment == 'sandbox' ? OAuthClient.environment.sandbox : OAuthClient.environment.production;
+
         oauthClient
             .makeApiCall({
-                url: `${url}v3/company/${companyID}/account/${req.body.id}`,
+                url: `${url}v3/company/${companyID}/account`,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
             })
             .then(function (authResponse) {
                 // console.log(authResponse.body);
                 // if (typeof (authResponse.body.Account.Name) === 'undefined') {
                 //     return false;
                 // }
-                console.log('ok');
+                console.log('ok', authResponse.body);
                 res.json(true);
             })
             .catch(function (e) {
