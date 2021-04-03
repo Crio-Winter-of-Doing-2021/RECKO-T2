@@ -8,6 +8,7 @@ export default function Login({setAuth}){
 
     const [username,setUsername]=useState('');
     const [password,setPassword]=useState('');
+    const[message,setMessage]=useState('');
     const history=useHistory();
     const submitForm = async (e) =>{
         e.preventDefault();
@@ -19,10 +20,13 @@ export default function Login({setAuth}){
                 body: JSON.stringify(body)
             });
             const parseRes=await response.json();
-            if(parseRes.message!==undefined)
+            if(parseRes.message==='login')
             setAuth(true);
-            else
+            else{
+            setMessage(parseRes.message);
             setAuth(false);
+            console.log(message);
+            }
             localStorage.setItem("token",parseRes.token);
         }catch(err){
             console.log(err.message);
@@ -69,7 +73,9 @@ export default function Login({setAuth}){
               mt="50px"
             >
                 <Typography variant="h5" color="textSecondary">Admin</Typography>
-               
+                {message!==''?
+                 <Typography variant="h5" color="textSecondary">{message}</Typography>
+                :null}       
         
                 <form onSubmit={submitForm}> 
 

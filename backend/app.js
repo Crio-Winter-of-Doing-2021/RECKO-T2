@@ -369,10 +369,10 @@ app.post('/register', async (req, res) => {
                 return res.status(409).send("User already exists with this username");
             } else {
                 if (req.body.password.length < 6) {
-                    return res.json('Password length should be greater than 6 characters')
+                    return res.json({ message: 'Password length should be greater than 6 characters' })
                 }
                 else if (req.body.password != req.body.confirmPassword) {
-                    return res.json('Password doesn\'t match');
+                    return res.json({ message: 'Password doesn\'t match' });
                 }
                 bcrypt.hash(req.body.password, 10, function (err, hash) {
                     if (err) {
@@ -418,11 +418,15 @@ app.post('/login', (req, res) => {
                             token
                         })
                     } else {
-                        res.sendStatus(403)
+                        res.json({
+                            message: 'Incorrect userrname or password'
+                        })
                     }
                 })
             } else {
-                res.sendStatus(403)
+                res.json({
+                    message: 'Incorrect userrname or password'
+                })
             }
         })
 })
