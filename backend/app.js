@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express')
+const crypto = require("crypto");
 const cron = require('node-cron')
 const jwtDecode = require('jwt-decode');
 const oc = require('openid-client')
@@ -357,218 +358,6 @@ app.post('/all', verifyToken, async (req, res) => {
         const data = await getDatu(orderDirection, valueToOrderBy, limit, page, columnToQuery, query);
         res.send(data);
     }
-
-    // await Journal.paginate({}, options, (err, found) => {
-    //     if (err) {
-    //         console.log(err);
-    //     } else {
-    //         if (found.length >= 1) {
-    //             found.forEach((item) => {
-    //                 const jbody = {
-    //                     name: item.Account_name,
-    //                     id: item.Account_id,
-    //                     amount: item.Amount,
-    //                     date: item.Date,
-    //                     type: item.Type
-    //                 }
-    //                 ar.push(jbody);
-    //             })
-    //         } else {
-    //             res.status(404).json({ message: 'No docs found for the request' });
-    //         }
-    //     }
-    // })
-    //     .then(async (response) => {
-    //         res.send(ar);
-    //     })
-    // res.send(json);
-    // const test =
-    //     [
-    //         {
-    //             name: "piyush",
-    //             id: "2123",
-    //             amount: 4158,
-    //             date: "2000-09-12",
-    //             type: "credit"
-    //         },
-    //         {
-    //             name: "aman",
-    //             id: "3123",
-    //             amount: 1234,
-    //             date: "2000-09-11",
-    //             type: "credit"
-    //         },
-    //         {
-    //             name: "amar",
-    //             id: "4123",
-    //             amount: 7890,
-    //             date: "2000-01-01",
-    //             type: "credit"
-    //         },
-    //         {
-    //             name: "xyz",
-    //             id: "1523",
-    //             amount: 4122,
-    //             date: "1999-11-11",
-    //             type: "credit"
-    //         },
-    //         {
-    //             name: "abc",
-    //             id: "1623",
-    //             amount: 9999,
-    //             date: "2005-11-15",
-    //             type: "credit"
-    //         },
-    //         {
-    //             name: "rahul",
-    //             id: "1232",
-    //             amount: 2389,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "qqq",
-    //             id: "1222",
-    //             amount: 1010,
-    //             date: "2011-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "rrr",
-    //             id: "1256",
-    //             amount: 1111,
-    //             date: "1990-09-12",
-    //             type: "credit"
-    //         },
-    //         {
-    //             name: "zzz",
-    //             id: "1231",
-    //             amount: 3412,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "rah",
-    //             id: "1247",
-    //             amount: 9234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "ahul",
-    //             id: "1270",
-    //             amount: 2340,
-    //             date: "2010-09-12",
-    //             type: "credit"
-    //         },
-    //         {
-    //             name: "raul",
-    //             id: "1236",
-    //             amount: 2234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "rahl",
-    //             id: "1235",
-    //             amount: 5234,
-    //             date: "2010-09-12",
-    //             type: "credit"
-    //         },
-    //         {
-    //             name: "racvsdfsdf",
-    //             id: "1237",
-    //             amount: 1234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "rahcxvxvcx",
-    //             id: "1237",
-    //             amount: 1234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "dfsdvcxvv",
-    //             id: "1237",
-    //             amount: 1234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "rahcsvvcvdf",
-    //             id: "1237",
-    //             amount: 1234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "rasdfsdfsd",
-    //             id: "1237",
-    //             amount: 1234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "rasdfsdfsdgfg",
-    //             id: "1237",
-    //             amount: 1234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "rahdfsdfgd",
-    //             id: "1237",
-    //             amount: 1234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "rasdvdfvfd",
-    //             id: "1237",
-    //             amount: 1234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "rdsffsdd",
-    //             id: "1237",
-    //             amount: 1234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "sdfdsgdfgf",
-    //             id: "1237",
-    //             amount: 1234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "rffsfdsv",
-    //             id: "1237",
-    //             amount: 1234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "dfgdfg",
-    //             id: "1237",
-    //             amount: 1234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-    //         {
-    //             name: "dfgddfg",
-    //             id: "1237",
-    //             amount: 1234,
-    //             date: "2010-09-12",
-    //             type: "debit"
-    //         },
-
-    //     ]
-
 })
 
 app.post('/register', async (req, res) => {
@@ -577,13 +366,13 @@ app.post('/register', async (req, res) => {
             console.log(err);
         } else {
             if (found) {
-                return res.status(409).send(false);
+                return res.status(409).send("User already exists with this username");
             } else {
                 if (req.body.password.length < 6) {
-                    return res.send('Password length should be greater than 6 characters')
+                    return res.json('Password length should be greater than 6 characters')
                 }
                 else if (req.body.password != req.body.confirmPassword) {
-                    return res.send('Password doesn\'t match');
+                    return res.json('Password doesn\'t match');
                 }
                 bcrypt.hash(req.body.password, 10, function (err, hash) {
                     if (err) {
@@ -608,21 +397,6 @@ app.post('/register', async (req, res) => {
             }
         }
     })
-    // try{
-    //     const salt=await bcrypt.genSalt(10)
-    //     const hashPassword=await bcrypt.hash(req.body.password,salt)
-    //     const user={username:req.body.username,password:hashPassword}
-    //     const newUser=await new User(user);
-    //    await newUser.save();
-    // //  const  token=jwt.sign({username:user.username});
-    //    res.send("ok");
-    // }
-    // catch{
-    //     console.log(error);
-    //     res.send(error);
-    // }
-    // console.log(req.body);
-    // res.send(true);
 })
 app.post('/login', (req, res) => {
     var username = req.body.username;
@@ -837,53 +611,10 @@ cron.schedule('3 5 * * *', async () => {
     const val2 = await getquickjournals();
     console.log(val1, val2);
 });
-
-app.get('/getJournals', async function (req, res) {
-    // await getToken();
-    // await refreshtoken();
-    const companyID = oauthClient.getToken().realmId;
-    const url =
-        oauthClient.environment == 'sandbox' ? OAuthClient.environment.sandbox : OAuthClient.environment.production;
-    oauthClient
-        .makeApiCall({
-            url: `${url}v3/company/${companyID}/query?query=select * from JournalEntry where 
-      Metadata.CreateTime 
-      > '2014-12-31'` })
-        .then(function (authResponse) {
-            const query = (JSON.parse(authResponse.text()));
-            const journalentries = query.QueryResponse.JournalEntry;
-            let c = 1;
-            journalentries.forEach(function (entry) {
-                const Date = entry.TxnDate;
-                entry.Line.forEach(function (line) {
-                    const Account_name = line.JournalEntryLineDetail.AccountRef.name;
-                    const Account_id = line.JournalEntryLineDetail.AccountRef.value;
-                    const Amount = line.Amount;
-                    const Type = line.JournalEntryLineDetail.PostingType;
-                    const jbody = {
-                        Provider: 'quickbooks',
-                        Org: companyID,
-                        Account_name: Account_name,
-                        Account_id: Account_id,
-                        Amount: Amount,
-                        Date: Date,
-                        Type: Type
-                    }
-                    const qentry = new Journal(jbody);
-                    qentry.save();
-                    console.log(`saved ${c}`);
-                    c = c + 1;
-                })
-            })
-            res.send('successful');
-        })
-        .catch(function (e) {
-            console.error(e);
-        });
-});
 app.post('/xero/new', verifyToken, async (req, res, next) => {
     try {
-        const account = { name: req.body.name, code: req.body.name + "c:" + 365, type: xeroNode.AccountType.EXPENSE, hasAttachments: true };
+        const n = crypto.randomInt(1000, 1000000);
+        const account = { name: req.body.name, code: "c:" + n, type: xeroNode.AccountType.EXPENSE, hasAttachments: true };
         const accountCreateResponse = await xero.accountingApi.createAccount(id, account);
         console.log(accountCreateResponse.body);
         res.send({ message: 'Account created' });
@@ -915,7 +646,7 @@ app.post('/quickbooks/new', verifyToken, (req, res, next) => {
             body: JSON.stringify(body)
         })
         .then(function (authResponse) {
-            console.log(authResponse.body);
+            console.log(JSON.stringify(authResponse.body));
             res.send({ message: 'Account created' });
         })
         .catch(function (e) {
@@ -937,14 +668,59 @@ app.delete('/quickbooks/delete', verifyToken, (req, res, next) => {
     console.log(req.body);
 })
 
-app.post('/xero/edit', verifyToken, (req, res, next) => {
-    console.log(req.body);
+
+app.post('/xero/edit', verifyToken, async (req, res, next) => {
+
     res.send({ name: "piyush", description: "check" });
 })
 
-app.post('/quickbooks/edit', verifyToken, (req, res, next) => {
-    console.log(req.body);
-    res.send({ name: "piyush", description: "check" });
+app.post('/quickbooks/edit', verifyToken, async (req, res, next) => {
+    // console.log(req.body);
+    const length = Object.keys(req.body).length;
+    if (length == 2) {
+        const companyID = oauthClient.getToken().realmId;
+        const url =
+            oauthClient.environment == 'sandbox' ? OAuthClient.environment.sandbox : OAuthClient.environment.production;
+        oauthClient
+            .makeApiCall({
+                url: `${url}v3/company/${companyID}/account/${req.body.id}`,
+            })
+            .then(function (authResponse) {
+                // console.log(authResponse.body);
+                // if (typeof (authResponse.body.Account.Name) === 'undefined') {
+                //     return false;
+                // }
+                console.log('ok');
+                res.json(true);
+            })
+            .catch(function (e) {
+                // console.log(e);
+                console.log('not ok');
+                res.json(false);
+            });
+    } else {
+        const companyID = oauthClient.getToken().realmId;
+        const url =
+            oauthClient.environment == 'sandbox' ? OAuthClient.environment.sandbox : OAuthClient.environment.production;
+        oauthClient
+            .makeApiCall({
+                url: `${url}v3/company/${companyID}/account/${req.body.id}`,
+            })
+            .then(function (authResponse) {
+                // console.log(authResponse.body);
+                // if (typeof (authResponse.body.Account.Name) === 'undefined') {
+                //     return false;
+                // }
+                console.log('ok');
+                res.json(true);
+            })
+            .catch(function (e) {
+                // console.log(e);
+                console.log('not ok');
+                res.json(false);
+            });
+    }
+    // res.send({ name: "piyush", description: "check" });
 })
 
 
