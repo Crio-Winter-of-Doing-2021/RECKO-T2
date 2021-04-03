@@ -271,7 +271,7 @@ const getData = async (od, vob, limit, page) => {
 }
 const getDatu = async (od, vob, limit, page, ctq, query) => {
     let ar = [];
-    let order;
+    let order=0;
     let field;
     let qfield;
     if (ctq == 'Date') {
@@ -300,10 +300,11 @@ const getDatu = async (od, vob, limit, page, ctq, query) => {
     }
     if (od == 'asc') {
         order = 1;
-    } else if (od == 'desc') {
+    }  if (od == 'desc') {
         order = -1;
-    } else {
-        await Journal.find()
+    }
+    if(order===0){
+        await Journal.find({ [qfield]: {$regex: new RegExp("^"+query.toLowerCase(),"i")} })
             .limit(limit * 1)
             .skip(page * limit)
             .exec()
@@ -351,7 +352,7 @@ app.post('/all', verifyToken, async (req, res) => {
     const columnToQuery = req.body.columnToQuery;
     const orderDirection = req.body.orderDirection;
     const valueToOrderBy = req.body.valueToOrderBy;
-    if (query == '') {
+    if (query === '') {
         const data = await getData(orderDirection, valueToOrderBy, limit, page);
         res.send(data);
     } else {
