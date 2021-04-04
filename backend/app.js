@@ -271,7 +271,7 @@ const getData = async (od, vob, limit, page) => {
 }
 const getDatu = async (od, vob, limit, page, ctq, query) => {
     let ar = [];
-    let order=0;
+    let order = 0;
     let field;
     let qfield;
     if (ctq == 'Date') {
@@ -300,11 +300,11 @@ const getDatu = async (od, vob, limit, page, ctq, query) => {
     }
     if (od == 'asc') {
         order = 1;
-    }  if (od == 'desc') {
+    } if (od == 'desc') {
         order = -1;
     }
-    if(order===0){
-        await Journal.find({ [qfield]: {$regex: new RegExp("^"+query.toLowerCase(),"i")} })
+    if (order === 0) {
+        await Journal.find({ [qfield]: { $regex: new RegExp("^" + query.toLowerCase(), "i") } })
             .limit(limit * 1)
             .skip(page * limit)
             .exec()
@@ -510,6 +510,8 @@ app.get('/qcallback', function (req, res) {
         });
 });
 const getxerojournals = async () => {
+    const validTokenSet = await xero.refreshToken();
+    xero.setTokenSet(validTokenSet);
     try {
         //GET ALL
         const org = process.env.TENANT;
@@ -617,6 +619,8 @@ cron.schedule('3 5 * * *', async () => {
     console.log(val1, val2);
 });
 app.post('/xero/new', verifyToken, async (req, res, next) => {
+    const validTokenSet = await xero.refreshToken();
+    xero.setTokenSet(validTokenSet);
     try {
         const n = crypto.randomInt(1000, 1000000);
         const account = { name: req.body.name, code: "c:" + n, type: xeroNode.AccountType.EXPENSE, description: req.body.description, hasAttachments: true };
@@ -663,6 +667,8 @@ app.post('/quickbooks/new', verifyToken, (req, res, next) => {
 })
 
 app.delete('/xero/delete', verifyToken, async (req, res, next) => {
+    const validTokenSet = await xero.refreshToken();
+    xero.setTokenSet(validTokenSet);
     try {
         let accountDeleteResponse = await xero.accountingApi.deleteAccount(id, req.body.id);
         console.log(accountDeleteResponse.body);
@@ -685,9 +691,13 @@ app.post('/xero/edit', verifyToken, async (req, res, next) => {
     // res.send({ name: "piyush", description: "check" });
     const length = Object.keys(req.body).length;
     if (length == 2) {
+        const validTokenSet = await xero.refreshToken();
+        console.log(validTokenSet);
+        xero.setTokenSet(validTokenSet);
         try {
             const accountGetResponse = await xero.accountingApi.getAccount(id, req.body.id);
             ob2 = accountGetResponse.body;
+            console.log(ob2.accounts[0]);
             res.json(true);
         } catch (error) {
             console.log(error);
@@ -695,18 +705,35 @@ app.post('/xero/edit', verifyToken, async (req, res, next) => {
         }
     }
     else {
+        const validTokenSet = await xero.refreshToken();
+        xero.setTokenSet(validTokenSet);
+        const tokenSet = xero.readTokenSet();
         try {
-            const accountUp = new xeroNode.Account({ name: ob2.accounts[0].name });
-            const accounts = new xeroNode.Accounts({ accounts: [accountUp] });
-            const accountUpdateResponse = await xero.accountingApi.updateAccount(id, ob2.accounts[0].accountID, accounts);
-            console.log(accountUpdateResponse.body);
-            res.json(true);
+            const body = {
+                "Accounts": [{ "Code": ob2.accounts[0].code, "Name": ob2.accounts[0].name, "AccountID": ob2.accounts[0].accountID, "Type": ob2.accounts[0].type, "Description": req.body.description, "TaxType": ob2.accounts[0].taxType, "EnablePaymentsToAccount": ob2.accounts[0].enablePaymentsToAccount, "ShowInExpenseClaims": ob2.accounts[0].showInExpenseClaims, "Class": ob2.accounts[0]._class, "ReportingCode": ob2.accounts[0].reportingCode, "ReportingCodeName": ob2.accounts[0].reportingCodeName, "UpdatedDateUTC": ob2.accounts[0].updatedDateUTC }]
+            }
+            fetch(`https://api.xero.com/api.xro/2.0/Accounts/${ob2.accounts[0].accountID}`, {
+                method: 'POST',
+                body: JSON.stringify(body),
+                headers: {
+                    'Authorization': 'Bearer ' + tokenSet.access_token,
+                    'xero-tenant-id': id,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then((response) => response.json())
+                .then((jomila) => {
+                    console.log(jomila);
+                    res.json(true);
+                })
         } catch (error) {
             console.log(error);
             res.json(false);
         }
     }
 })
+
 let ob;
 app.post('/quickbooks/edit', verifyToken, async (req, res, next) => {
     // console.log(req.body);
@@ -751,7 +778,7 @@ app.post('/quickbooks/edit', verifyToken, async (req, res, next) => {
             "AccountType": ob.Account.AccountType,
             "CurrentBalance": ob.Account.CurrentBalance,
             "Active": true,
-            "SyncToken": "0",
+            "SyncToken": ob.Account.SyncToken,
             "Id": ob.Account.Id,
             "Name": ob.Account.Name
         }
