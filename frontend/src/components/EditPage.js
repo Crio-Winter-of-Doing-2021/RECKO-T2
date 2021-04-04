@@ -44,6 +44,7 @@ export default function ClippedDrawer({setAuth,logout}) {
   const classes = useStyles();
   const [check,onCheck]=useState(false)
   const [message,setMessage]=useState(false)
+  const [message1,setMessage1]=useState('')
   const [company,setCompany]=useState('')
   const [name,setName]=useState('')
   const [description,setDescription]=useState('')
@@ -68,7 +69,11 @@ export default function ClippedDrawer({setAuth,logout}) {
         const tmp=await response.json();
           setName(tmp.name);
           setDescription(tmp.description)
-          onCheck(true);
+          onCheck(tmp);
+          if(tmp===false){
+          setMessage(false)
+          setMessage1('Invalid Id')
+          }
         }
         else
         {
@@ -83,7 +88,11 @@ export default function ClippedDrawer({setAuth,logout}) {
         const tmp=await response.json();
         setName(tmp.name);
         setDescription(tmp.description)
-        onCheck(true);
+        onCheck(tmp);
+        if(tmp===false){
+        setMessage1('Invalid Id')
+        setMessage(false)
+        }
         
         }
       }
@@ -111,6 +120,7 @@ export default function ClippedDrawer({setAuth,logout}) {
       const tmp=await response.json();
         onCheck(false);
         setMessage(true)
+        setMessage1('')
       }
       else
       {
@@ -125,6 +135,7 @@ export default function ClippedDrawer({setAuth,logout}) {
       const parseRes=await response.json();
         onCheck(false);
         setMessage(true)
+        setMessage1('')
       }
     }
     catch(err){
@@ -257,7 +268,7 @@ export default function ClippedDrawer({setAuth,logout}) {
       <main className={classes.content}>
         <Toolbar />
        
-       <EditForm onEdit={editAccount} onEdit1={editAccount1} oldName={name} oldDescription={description} check={check} setcompany={company} message={message}/>
+       <EditForm onEdit={editAccount} onEdit1={editAccount1} oldName={name} oldDescription={description} check={check} setcompany={company} message={message} message1={message1}/>
       </main>
     </div>
   );

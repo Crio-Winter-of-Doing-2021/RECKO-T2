@@ -6,7 +6,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 
 
 
-const EditAccount = ({ onEdit, onEdit1, oldName, oldDescription, check, setcompany, message }) => {
+const EditAccount = ({ onEdit, onEdit1, oldName, oldDescription, check, setcompany, message,message1 }) => {
   const [id, setId] = useState('')
   const [company, setCompany] = React.useState(setcompany);
   const [name, setName] = useState(oldName)
@@ -44,13 +44,18 @@ const EditAccount = ({ onEdit, onEdit1, oldName, oldDescription, check, setcompa
         mt="50px"
       >
         <Typography variant="h5" color="textSecondary">Edit Form</Typography>
-        {message === true ?
-          <Typography variant="h5" color="textSecondary">Account Edited</Typography>
-          : null}
+       
 
         {check === false ?
           <form onSubmit={onSubmit}>
 
+          {message ===true?
+          <Typography variant="h5" color="textSecondary">Account Edited</Typography>
+          : null}
+            
+            {message1 !=='' ?
+          <Typography variant="h5" color="textSecondary">{message1}</Typography>
+          : null}
 
             <TextField
               label="Id"
