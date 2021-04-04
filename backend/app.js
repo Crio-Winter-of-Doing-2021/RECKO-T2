@@ -634,10 +634,23 @@ app.post('/xero/new', verifyToken, async (req, res, next) => {
         // res.redirect('http://localhost:3000/homepage')
     }
 })
-
-app.post('/quickbooks/new', verifyToken, (req, res, next) => {
+const quickrefresh = async () => {
+    oauthClient
+        .refresh()
+        .then(function (authResponse) {
+            console.log(JSON.stringify(authResponse.getJson()));
+            oauth2_token_json = JSON.stringify(authResponse.getJson());
+            return true;
+        })
+        .catch(function (e) {
+            console.error(e);
+            return false;
+        });
+}
+app.post('/quickbooks/new', verifyToken, async (req, res, next) => {
     // res.send({ message: 'Account Created' })
     // console.log(req.body);
+    const check = await quickrefresh();
     const body = {
         "Name": req.body.name,
         "AccountType": "Expense"
@@ -687,8 +700,7 @@ app.delete('/quickbooks/delete', verifyToken, (req, res, next) => {
 
 let ob2;
 app.post('/xero/edit', verifyToken, async (req, res, next) => {
-
-    // res.send({ name: "piyush", description: "check" });
+    const check = await quickrefresh();
     const length = Object.keys(req.body).length;
     if (length == 2) {
         const validTokenSet = await xero.refreshToken();
@@ -737,6 +749,7 @@ app.post('/xero/edit', verifyToken, async (req, res, next) => {
 let ob;
 app.post('/quickbooks/edit', verifyToken, async (req, res, next) => {
     // console.log(req.body);
+    const check = await quickrefresh();
     const length = Object.keys(req.body).length;
     if (length == 2) {
         const companyID = oauthClient.getToken().realmId;
