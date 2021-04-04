@@ -618,15 +618,15 @@ cron.schedule('3 5 * * *', async () => {
 app.post('/xero/new', verifyToken, async (req, res, next) => {
     try {
         const n = crypto.randomInt(1000, 1000000);
-        const account = { name: req.body.name, code: "c:" + n, type: xeroNode.AccountType.EXPENSE, hasAttachments: true };
+        const account = { name: req.body.name, code: "c:" + n, type: xeroNode.AccountType.EXPENSE, description: req.body.description, hasAttachments: true };
         const accountCreateResponse = await xero.accountingApi.createAccount(id, account);
         console.log(accountCreateResponse.body);
         res.send({ message: 'Account created' });
     } catch (error) {
         console.error(error);
-        id = null;
-        id2 = null;
-        res.redirect('http://localhost:3000/homepage')
+        // id = null;
+        // id2 = null;
+        // res.redirect('http://localhost:3000/homepage')
     }
 })
 
@@ -655,9 +655,9 @@ app.post('/quickbooks/new', verifyToken, (req, res, next) => {
         })
         .catch(function (e) {
             console.error(e);
-            id = null;
-            id2 = null;
-            res.redirect('http://localhost:3000/homepage')
+            // id = null;
+            // id2 = null;
+            // res.redirect('http://localhost:3000/homepage')
         });
 })
 
