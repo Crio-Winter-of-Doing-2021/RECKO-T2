@@ -135,21 +135,83 @@ app.post('/check', verifyToken, (req, res) => {
 app.post('/logout', verifyToken, (req, res) => {
     console.log("logout");
 })
+const quickrefresh = async () => {
+    oauthClient
+        .refresh()
+        .then(function (authResponse) {
+            console.log(JSON.stringify(authResponse.getJson()));
+            oauth2_token_json = JSON.stringify(authResponse.getJson());
+            return true;
+        })
+        .catch(function (e) {
+            console.error(e);
+            return false;
+        });
+}
 let id = null;
 let id2 = null;
 app.post('/ck', verifyToken, async (req, res) => {
-    try {
-        if (id == null || id2 == null) {
-            console.log(id, id2);
-            res.json(false);
-        }
-        else {
-            console.log(id, id2);
-            res.json(true);
-        }
-    } catch (error) {
-        console.log(error);
-    }
+    await Tokenwa.findOne({ _id: '60620d47001d4a3e7c9a7f51' })
+        .exec()
+        .then(async (resp) => {
+            // console.log(res);
+            var token = {
+                id_token: resp.id_token,
+                access_token: resp.access_token,
+                expires_at: resp.expires_at,
+                token_type: resp.token_type,
+                refresh_token: resp.refresh_token,
+                scope: resp.scope
+            }
+            // const base = 'Mzk0QzM5MDVCMkNGNDYwQjg2QzYxQjJBMkE0MjczN0I6RmxualVTZzNwWXc4Q2ZyMlQycWFCb0RlcmJJZmNhd1ZoZ3BGMENzZUp5SUQ5NlpQ';
+            xero.setTokenSet(token);
+            const getToken = xero.readTokenSet();
+            console.log(getToken);
+            console.log(getToken.expired(), oauthClient.isAccessTokenValid());
+            if (getToken.expired() || !oauthClient.isAccessTokenValid()) {
+                res.json(false);
+            } else {
+                const newXeroClient = new xeroNode.XeroClient();
+                const refreshedTokenSet = await newXeroClient.refreshWithRefreshToken(client_id, client_secret, getToken.refresh_token);
+                xero.setTokenSet(refreshedTokenSet);
+                res.json(true);
+            }
+
+            // console.log(refreshedTokenSet.expired());
+            // fetch(`https://identity.xero.com/connect/token`, {
+            //     method: 'POST',
+            //     body: {
+            //         'grant_type': 'refresh_token',
+            //         'refresh_token': getToken.refresh_token,
+            //         'client_id': client_id,
+            //         'client_secret': client_secret
+            //     },
+            //     // body: `grant_type=refresh_token&refresh_token=${getToken.refresh_token}&client_id=${client_id}&client_secret=${client_secret}`,
+            //     headers: {
+            //         'grant_type': 'refresh_token',
+            //         'Content-Type': 'application/json'
+            //     }
+            // })
+            //     .then((response) => response.json())
+            //     .then((jomila) => {
+            //         console.log(jomila);
+            //     })
+        })
+        .catch(e => {
+            console.log(e);
+        })
+    // try {
+    //     if (id == null || id2 == null) {
+    //         console.log(id, id2);
+    //         res.json(false);
+    //     }
+    //     else {
+    //         console.log(id, id2);
+    //         res.json(true);
+    //     }
+    // } catch (error) {
+    //     console.log(error);
+    // }
     // const tokenSet = new oc.TokenSet(found);
     // if (tokenSet.expired()) {
     //     res.json(false);
@@ -323,7 +385,7 @@ const getDatu = async (od, vob, limit, page, ctq, query) => {
         // console.log(ar);
         return ar;
     }
-    await Journal.find({ [qfield]: query })
+    await Journal.find({ [qfield]: { $regex: new RegExp("^" + query.toLowerCase(), "i") } })
         .limit(limit * 1)
         .skip(page * limit)
         .sort({ [field]: order })
@@ -447,18 +509,17 @@ app.get('/callback', async (req, res) => {
     try {
 
         const tokenSet = await xero.apiCallback(req.url);
-        await Tokenwa.findOneAndUpdate(null, {
-            id_token: tokenSet.id_token,
-            access_token: tokenSet.access_token,
-            expires_at: tokenSet.expires_at,
-            token_type: tokenSet.token_type,
-            refresh_token: tokenSet.refresh_token,
-            scope: tokenSet.scope
-        }, null, (err, result) => {
+        await Tokenwa.findOne({ _id: '60620d47001d4a3e7c9a7f51' }, (err, result) => {
             if (err) {
                 console.log(err);
             } else {
-                return result;
+                result.id_token = tokenSet.id_token;
+                result.access_token = tokenSet.access_token;
+                result.expires_at = tokenSet.expires_at;
+                result.token_type = tokenSet.token_type;
+                result.refresh_token = tokenSet.refresh_token;
+                result.scope = tokenSet.scope;
+                result.save();
             }
         })
             .then(async (result) => {
@@ -473,11 +534,12 @@ app.get('/callback', async (req, res) => {
                 req.session.allTenants = xero.tenants;
                 req.session.activeTenant = xero.tenants[0];
                 id = req.session.activeTenant.tenantId;
+                console.log(id);
                 res.redirect('http://localhost:3000/homepage');
             })
 
     } catch (err) {
-        res.redirect('http://localhost:3000/homepage');
+        console.log(err);
     }
 });
 app.post('/quickbooks/login', verifyToken, async (req, res, next) => {
@@ -492,6 +554,7 @@ app.get('/qcallback', function (req, res) {
         .createToken(req.url)
         .then(function (authResponse) {
             oauth2_token_json = authResponse.getJson();
+            console.log(oauth2_token_json);
             // const newToken = new qtokenSet(oauth2_token_json);
             // newToken.save(err => {
             //     if (err) {
@@ -634,19 +697,7 @@ app.post('/xero/new', verifyToken, async (req, res, next) => {
         // res.redirect('http://localhost:3000/homepage')
     }
 })
-const quickrefresh = async () => {
-    oauthClient
-        .refresh()
-        .then(function (authResponse) {
-            console.log(JSON.stringify(authResponse.getJson()));
-            oauth2_token_json = JSON.stringify(authResponse.getJson());
-            return true;
-        })
-        .catch(function (e) {
-            console.error(e);
-            return false;
-        });
-}
+
 app.post('/quickbooks/new', verifyToken, async (req, res, next) => {
     // res.send({ message: 'Account Created' })
     // console.log(req.body);
